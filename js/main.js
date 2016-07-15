@@ -5,17 +5,32 @@ var keys={
 	'RIGHT':68,
 	'DOWN':83,
 	'LEFT':65,
-
+	'SPACE':32
 }
 
 var camera,scene,renderer;
 var width=window.innerWidth,height=window.innerHeight;
 var canvas;
 
+var clock
 
+var global_speed=6.5;
 var player;
+
+var enemyGeom;
+var enemyMaterial;
+
+var bulletGeom1;
+var bulletMaterial1;
+
+var enemys=[];
+var playerBullets=[];
+
 var terrain;
 var terrain2;
+
+var rayCaster;
+var mouse=new THREE.Vector2();
 
 function init(){
 	scene=new THREE.Scene();
@@ -25,94 +40,120 @@ function init(){
 	canvas=renderer.domElement;
 	document.body.appendChild( canvas );
 	console.log("Hello1");
-	camera.position.z=24;
+
+	clock=new THREE.Clock();
+
+	camera.position.z=20;
 	camera.position.y=6;
 	var geom=new THREE.BoxGeometry(1,1,1);
 	var mat=new THREE.MeshBasicMaterial({color:0x00ff00});
 
+	enemyGeom=new THREE.SphereGeometry(2,16,16);
+	enemyMaterial=new THREE.MeshBasicMaterial({color:Math.random()*0xffffff});
+
+	bulletGeom1=new THREE.SphereGeometry(0.4,8,8);
+	bulletMaterial1=new THREE.MeshBasicMaterial({color:Math.random()*0xffffff});
+
 	player=new Player(geom,mat);
 	player.addToScene(scene);
 
-	terrain=new Terrain(new THREE.Vector3(0,0,-300));
+	terrain=new Terrain(new THREE.Vector3(0,0,-1000));
 	terrain.addToScene(scene);
 
 	terrain2=new Terrain(new THREE.Vector3(0,0,0));
 	terrain2.addToScene(scene);
 
+
+
 	document.onkeydown=press_keyboard;
 	document.onkeyup=up_keyboard;
-
+	document.onmousemove=mouse_move;
+	clock.start();
 	render();
-}
 
+}
+var time=50,timer=0;
 function render(){
+	
 	renderer.render(scene,camera);
 
 	cameraUpdate();
 	player.update();
 	terrain.update();
 	terrain2.update();
-
+	for (var i = 0; i < enemys.length; i++) {
+		enemys[i].update();
+		if(enemys[i].isLife==false) {
+			enemys[i].removeFromScene(scene);
+			enemys.splice(i,1);
+		}
+	}
+	for (var i = 0; i < playerBullets.length; i++) {
+		playerBullets[i].update();
+		if(playerBullets[i].isLife==false) {
+			playerBullets[i].removeFromScene(scene);
+			playerBullets.splice(i,1);
+		}
+	}
 	if(isKeyDown('DOWN')) player.move(2);
 	if(isKeyDown('UP')) player.move(0);
 	if(isKeyDown('LEFT')) player.move(3);
 	if(isKeyDown('RIGHT')) player.move(1);
+	
+	if(isKeyDown('SPACE')) playerShoot();
+	timer+=1;
+	//createEnemy();
+	if(timer-time>0){
+		createEnemy();
+		//time=timer;
+		timer=0;
+	}
+	//console.log("TIME "+timer);
 
-
+	
+	testRaycaster();
 	requestAnimationFrame(render);
 }
 
 
-
-var Player=function(g,m){
-	this.geometry=g;
-	this.material=m;
-	this.position=new THREE.Vector3(0,0,0);
-	this.speed=new THREE.Vector3(0,0,0);
-	this.mesh=new THREE.Mesh(this.geometry,this.material);
-};
-
-
-
-
-Player.prototype.addToScene = function(scene) {
-	scene.add(this.mesh);
-};
-
-Player.prototype.move = function(dir) {
-	console.log("dir "+dir);
-	switch(dir){
-		case 0:
-		this.speed.set(0,0.2,0);
-		//console.log("speed "+this.speed);
-		break;
-
-		case 1:
-		this.speed.set(0.2,0,0);
-		break;
-
-		case 2:
-		this.speed.set(0,-0.2,0);
-		break;
-
-		case 3:
-		this.speed.set(-0.2,0,0);
-		break;
-
-	}
-
-	this.position.add(this.speed);
-	
-	//this.speed.set(0,0,0);
-	//console.log(this.position);
-};
-
-Player.prototype.update = function() {
-	this.mesh.position.x=this.position.x;
-	this.mesh.position.y=this.position.y;
-	this.mesh.position.z=this.position.z;
-};
-
 var cameraUpdate=function(){
-	camera.position.x=player.mesh.position.x;
+
+	camera.position.x=player.position.x;
+	camera.position.y=player.position.y+5;
+};
+
+var createEnemy=function(){
+	var position=new THREE.Vector3(Math.random()*200-100,Math.random()*100,-1000);
+	var newEnemy=new Enemy(enemyGeom,enemyMaterial,position);
+	newEnemy.addToScene(scene);
+	enemys.push(newEnemy);
+
+};
+var createBullet=function(from,toPush,speed,acc){
+	var newBullet=new Bullet(bulletGeom1,bulletMaterial1,from,speed,acc);
+	newBullet.addToScene(scene);
+	toPush.push(newBullet);
 }
+var playerShoot=function(){
+	if(player.reloadTime<player.reloadTimer){
+		var pos=new THREE.Vector3(0,0,0); 
+		pos.add(player.position);
+		pos.add(new THREE.Vector3(0,0,-3));
+		createBullet(pos,playerBullets,new THREE.Vector3(0,0,-1),16);
+
+		player.reloadTimer=0;
+	}
+	
+};
+
+var testRaycaster=function(){
+	rayCaster=new THREE.Raycaster();
+	rayCaster.setFromCamera(mouse,camera);
+	//rayCaster=new THREE.Raycaster(camera.position,new THREE.Vector3(0,0,-1),0.1,1000);
+	var intersects=rayCaster.intersectObjects(scene.children);
+
+	for (var i = 0; i < intersects.length; i++) {
+		i//ntersects[i].object.material.color.set(Math.random()*0xffffff);
+	}
+	//console.log("MOUSE "+mouse.x+" "+mouse.y);
+};
