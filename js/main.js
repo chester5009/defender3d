@@ -111,7 +111,7 @@ function render(){
 	//console.log("TIME "+timer);
 
 	
-	testRaycaster();
+	intersectBulletsEnemys();
 	requestAnimationFrame(render);
 }
 
@@ -146,14 +146,14 @@ var playerShoot=function(){
 	
 };
 
-var testRaycaster=function(){
+var intersectBulletsEnemys=function(){
 	rayCaster=new THREE.Raycaster();
 	rayCaster.setFromCamera(mouse,camera);
 	//rayCaster=new THREE.Raycaster(camera.position,new THREE.Vector3(0,0,-1),0.1,1000);
 	var intersects=rayCaster.intersectObjects(scene.children);
 
 	for (var i = 0; i < intersects.length; i++) {
-		i//ntersects[i].object.material.color.set(Math.random()*0xffffff);
+		//intersects[i].object.material.color.set(Math.random()*0xffffff);
 	}
 	//console.log("MOUSE "+mouse.x+" "+mouse.y);
 };
