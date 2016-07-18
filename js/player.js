@@ -73,4 +73,7 @@ Player.prototype.update = function() {
 	this.reloadTimer++;
 	this.mesh.rotation.y=0;
 	this.mesh.rotation.x=-Math.PI/2;
+
+	
+	//this.mesh.children[0].rotation.x+=0.02;
 };
