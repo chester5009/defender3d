@@ -1,13 +1,17 @@
-var Enemy=function(g,m,position) {
+var Enemy=function(g,m,position,model) {
 	this.geometry=g;
 	this.material=m;
 	this.position=position;
 	this.acceleration=3.5;
 	this.speed=new THREE.Vector3(0,0,this.acceleration);
-	this.mesh=new THREE.Mesh(this.geometry,this.material);
+	this.mesh=model;
 	this.mesh.position.x=position.x;
 	this.mesh.position.y=position.y;
 	this.mesh.position.z=position.z;
+	this.mesh.rotation.x=-Math.PI/2;
+	this.mesh.scale.x=2;
+	this.mesh.scale.z=2;
+	this.mesh.scale.y=2;
 	this.isLife=true;
 }
 
@@ -24,4 +28,8 @@ Enemy.prototype.update = function() {
 	this.mesh.position.y=this.position.y;
 	this.mesh.position.z=this.position.z;
 	if(this.position.z>10)this.isLife=false;
+};
+
+Enemy.prototype.createBoundingBox = function()) {
+	
 };

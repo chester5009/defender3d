@@ -1,4 +1,4 @@
-window.onload=init;
+window.onload=preloader;
 
 var keys={
 	'UP':87,
@@ -20,6 +20,7 @@ var player;
 var playerModel;
 var geom,mat;
 
+var enemyModel;
 var enemyGeom;
 var enemyMaterial;
 
@@ -44,8 +45,52 @@ manager.onProgress = function ( item, loaded, total ) {
 	console.log( item, _loaded, _total );
 
 };
+manager.onLoad=function () {
+	console.log("All loaded!!");
+	console.log("MODEL LOADED",playerModel);
 
+	init();
+}
 var loader;
+
+
+
+function preloader() {
+	_total=1;
+	console.log(playerModel);
+	loader=new THREE.OBJLoader(manager);
+
+	loader.load('assets/Su-27_Flanker.obj',function(object){
+		object.traverse(function(child){
+			if(child instanceof THREE.Mesh){
+				child.material=new THREE.MeshNormalMaterial();
+			}
+		});
+		console.log("OBJ ",object);
+		playerModel=object;
+		
+	},onProgress,onError);
+
+	loader.load('assets/B-52H_Stratofortress_highpoly.obj',function(object){
+		object.traverse(function(child){
+			if(child instanceof THREE.Mesh){
+				child.material=new THREE.MeshNormalMaterial();
+			}
+		});
+		console.log("OBJ ",object);
+		enemyModel=object;
+		
+	},onProgress,onError);
+	//loader.load('assets/')
+	
+}
+
+function onProgress(xhr){
+	
+}
+function onError(){
+
+}
 
 function init(){
 	scene=new THREE.Scene();
@@ -69,11 +114,13 @@ function init(){
 	bulletGeom1=new THREE.SphereGeometry(0.4,8,8);
 	bulletMaterial1=new THREE.MeshBasicMaterial({color:Math.random()*0xffffff});
 
-	loadFiles();
+	//loadFiles();
 
 	console.log("Modell ",playerModel);
 	
-
+	player=new Player(geom,mat,playerModel);
+			player.addToScene(scene);
+			player.isReady=true;
 	
 
 	terrain=new Terrain(new THREE.Vector3(0,0,-1000));
@@ -98,7 +145,7 @@ function init(){
 }
 
 
-var loadFiles=function(){
+/*var loadFiles=function(){
 
 	var ambient=new THREE.AmbientLight(0xf3f3f3);
 	scene.add(ambient);
@@ -132,8 +179,8 @@ var loadFiles=function(){
 			player.isReady=true;
 			//scene.add( object );
 		}
-	);
-	/*loader=new THREE.OBJLoader(manager);
+		);
+	loader=new THREE.OBJLoader(manager);
 	loader.load('assets/Su-27_Flanker.obj',function(object){
 		object.traverse(function(child){
 			if(child instanceof THREE.Mesh ){
@@ -155,11 +202,11 @@ var loadFiles=function(){
 	},function(xhr){
 		console.log("LOADED!!!!",xhr);
 		
-	});*/
+	});
 
-};
+};*/
 
-var time=50,timer=0;
+var time=150,timer=0;
 function render(){
 	
 	renderer.render(scene,camera);
@@ -215,8 +262,8 @@ var cameraUpdate=function(){
 };
 
 var createEnemy=function(){
-	var position=new THREE.Vector3(Math.random()*200-100,Math.random()*100,-1000);
-	var newEnemy=new Enemy(enemyGeom,enemyMaterial,position);
+	var position=new THREE.Vector3(Math.random()*200-100,Math.random()*80+20,-1100);
+	var newEnemy=new Enemy(enemyGeom,enemyMaterial,position,enemyModel.clone());
 	newEnemy.addToScene(scene);
 	enemys.push(newEnemy);
 

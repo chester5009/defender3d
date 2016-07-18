@@ -68,7 +68,7 @@ Player.prototype.update = function() {
 	if(this.position.y>100)this.position.y=100;
 
 	if(this.position.x<-100)this.position.x=-100;
-	if(this.position.y<0)this.position.y=0;
+	if(this.position.y<10)this.position.y=10;
 
 	this.reloadTimer++;
 	this.mesh.rotation.y=0;

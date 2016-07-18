@@ -12,7 +12,7 @@ Terrain.prototype.init = function(position) {
 
 	for (var i = 0; i < this.geometry.vertices.length; i++) {
 		if(i>0){
-			this.geometry.vertices[i].z=Math.random()*6;
+			//this.geometry.vertices[i].z=Math.random()*6;
 		}
 										
 	}
