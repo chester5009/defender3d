@@ -286,13 +286,40 @@ var playerShoot=function(){
 };
 
 var intersectBulletsEnemys=function(){
-	rayCaster=new THREE.Raycaster();
-	rayCaster.setFromCamera(mouse,camera);
-	//rayCaster=new THREE.Raycaster(camera.position,new THREE.Vector3(0,0,-1),0.1,1000);
-	var intersects=rayCaster.intersectObjects(scene.children);
+	
+	var meshList=[];
+	for(var j=0;j<enemys.length;j++){
 
-	for (var i = 0; i < intersects.length; i++) {
-		//intersects[i].object.material.color.set(Math.random()*0xffffff);
+	}
+	//console.log("Bullets len ",playerBullets.length);
+	for(var i=0;i<playerBullets.length;i++){
+
+		var originPoint=playerBullets[i].position;
+
+		for(var vertexIndex=0;vertexIndex<playerBullets[i].mesh.geometry.vertices.length;vertexIndex++){
+
+
+			var localVertex=playerBullets[i].mesh.geometry.vertices[vertexIndex].clone();
+			var globalVertex=localVertex.applyMatrix4(playerBullets[i].mesh.matrix);
+			var directionVector=globalVertex.sub(playerBullets[i].mesh.position);
+
+			//console.log(directionVector.length());
+			for(var j=0;j<enemys.length;j++){
+
+				meshList=enemys[j].boundingMeshes.children;
+				var ray=new THREE.Raycaster(originPoint,directionVector.clone().normalize() );
+				var collisionResults=ray.intersectObjects(meshList);
+				if(collisionResults.length>0 && collisionResults[0].distance<directionVector.length()) {
+					//console.log(collisionResults[0].distance," ",directionVector.length());
+					enemys[j].setSpeedPostDead();
+					//enemys[j].isLife=false;
+
+				}
+				
+				
+			}
+		}
+		
 	}
 	//console.log("MOUSE "+mouse.x+" "+mouse.y);
 };

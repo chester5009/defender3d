@@ -15,7 +15,7 @@ var isKeyDown=function(keyName){
 var press_keyboard=function(event){
 	var kcode=event.keyCode;
 	setKey(kcode);
-	console.log(kcode);
+	//console.log(kcode);
 	
 }
 var up_keyboard=function(e) {

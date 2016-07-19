@@ -28,7 +28,7 @@ Player.prototype.removeFromScene = function(scene) {
 };
 
 Player.prototype.move = function(dir) {
-	console.log("dir "+dir);
+	//console.log("dir "+dir);
 	switch(dir){
 		case 0:
 		this.speed.set(0,this.acceleration,0);
