@@ -39,7 +39,10 @@ Enemy.prototype.update = function() {
 	this.boundingMeshes.position.y=this.position.y;
 	this.boundingMeshes.position.z=this.position.z;
 
-	if(this.position.z>10)this.isLife=false;
+	if(this.position.z>10){
+		snd3.play('sirena');
+		this.isLife=false;
+	}
 
 	//this.mesh.children[0].rotation.x+=0.02;
 	if(this.speedPostDead.length>0){

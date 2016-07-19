@@ -41,21 +41,24 @@ var _loaded=0;_total=0;
 var manager = new THREE.LoadingManager();
 manager.onProgress = function ( item, loaded, total ) {
 	_loaded=loaded;
-	_total=total;
+	_total=total+3;
 	console.log( item, _loaded, _total );
 
 };
 manager.onLoad=function () {
 	console.log("All loaded!!");
 	console.log("MODEL LOADED",playerModel);
-
+	if(_loaded>=_total)
 	init();
 }
+
+var snd,snd2,snd3;
 var loader;
 
 
 
 function preloader() {
+	loadSound();
 	_total=1;
 	console.log(playerModel);
 	loader=new THREE.OBJLoader(manager);
@@ -136,9 +139,9 @@ function init(){
 	document.onmousemove=mouse_move;
 
 	
-	while(_loaded<_total){
+	/*while(_loaded<_total){
 		console.log("loading :",_loaded," of ",_total);
-	}
+	}*/
 	clock.start();
 	render();
 
@@ -272,6 +275,8 @@ var createBullet=function(from,toPush,speed,acc){
 	var newBullet=new Bullet(bulletGeom1,bulletMaterial1,from,speed,acc);
 	newBullet.addToScene(scene);
 	toPush.push(newBullet);
+	
+		
 }
 var playerShoot=function(){
 	if(player.reloadTime<player.reloadTimer){
@@ -312,6 +317,8 @@ var intersectBulletsEnemys=function(){
 				if(collisionResults.length>0 && collisionResults[0].distance<directionVector.length()) {
 					//console.log(collisionResults[0].distance," ",directionVector.length());
 					enemys[j].setSpeedPostDead();
+					playerBullets[i].isLife=false;
+					snd2.play('boom');
 					//enemys[j].isLife=false;
 
 				}
@@ -323,3 +330,53 @@ var intersectBulletsEnemys=function(){
 	}
 	//console.log("MOUSE "+mouse.x+" "+mouse.y);
 };
+
+var loadSound=function() {
+	snd=new Howl({
+		urls:['assets/Sevnty - Return.mp3'],
+		volume:0.1,
+		loop:true,
+		onload:function(){
+			console.log("Loaded sound");
+			_loaded++;
+			if(_loaded>=_total)
+			init();
+		}
+	}).play();
+
+	snd2=new Howl({
+		urls:['assets/045.mp3'],
+		volume:0.01,
+		loop:false,
+		sprite:{
+			boom:[0,2000]
+		},
+		onload:function(){
+			console.log("Loaded sound");
+			_loaded++;
+			if(_loaded>=_total)
+			init();
+		},
+		onend:function(){
+			//snd2.stop();
+		}
+	});
+
+	snd3=new Howl({
+		urls:['assets/sirena.mp3'],
+		volume:0.4,
+		loop:false,
+		sprite:{
+			sirena:[0,2000]
+		},
+		onload:function(){
+			console.log("Loaded sound");
+			_loaded++;
+			if(_loaded>=_total)
+			init();
+		},
+		onend:function(){
+			//snd2.stop();
+		}
+	});
+}
