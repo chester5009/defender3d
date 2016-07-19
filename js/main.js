@@ -8,11 +8,17 @@ var keys={
 	'SPACE':32
 }
 
+var isPlaing=true;
+
 var camera,scene,renderer;
 var width=window.innerWidth,height=window.innerHeight;
 var canvas;
 
 var clock
+
+var text2;
+var totalLife=2;
+var currentLife=totalLife;
 
 var global_speed=6.5;
 var player;
@@ -96,6 +102,18 @@ function onError(){
 }
 
 function init(){
+
+	text2 = document.createElement('div');
+	text2.style.position = 'absolute';
+	//text2.style.zIndex = 1;    // if you still don't see the label, try uncommenting this
+	text2.style.width = 100;
+	text2.style.height = 100;
+	text2.style.backgroundColor = "white";
+	text2.innerHTML = "hi there!";
+	text2.style.top = 100 + 'px';
+	text2.style.left = 100 + 'px';
+	document.body.appendChild(text2);
+
 	scene=new THREE.Scene();
 	camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,1000);
 	renderer=new THREE.WebGLRenderer();
@@ -214,45 +232,48 @@ function render(){
 	
 	renderer.render(scene,camera);
 
-	
-	if(player!=null){
+	if(isPlaing){
+		if(player!=null){
 		cameraUpdate();
 		player.update();
-	}
-	
-	terrain.update();
-	terrain2.update();
-	for (var i = 0; i < enemys.length; i++) {
-		enemys[i].update();
-		if(enemys[i].isLife==false) {
-			enemys[i].removeFromScene(scene);
-			enemys.splice(i,1);
 		}
-	}
-	for (var i = 0; i < playerBullets.length; i++) {
-		playerBullets[i].update();
-		if(playerBullets[i].isLife==false) {
-			playerBullets[i].removeFromScene(scene);
-			playerBullets.splice(i,1);
+		
+		terrain.update();
+		terrain2.update();
+		for (var i = 0; i < enemys.length; i++) {
+			enemys[i].update();
+			if(enemys[i].isLife==false) {
+				enemys[i].removeFromScene(scene);
+				enemys.splice(i,1);
+			}
 		}
-	}
-	if(isKeyDown('DOWN')) player.move(2);
-	if(isKeyDown('UP')) player.move(0);
-	if(isKeyDown('LEFT')) player.move(3);
-	if(isKeyDown('RIGHT')) player.move(1);
-	
-	if(isKeyDown('SPACE')) playerShoot();
-	timer+=1;
-	//createEnemy();
-	if(timer-time>0){
-		createEnemy();
-		//time=timer;
-		timer=0;
-	}
-	//console.log("TIME "+timer);
+		for (var i = 0; i < playerBullets.length; i++) {
+			playerBullets[i].update();
+			if(playerBullets[i].isLife==false) {
+				playerBullets[i].removeFromScene(scene);
+				playerBullets.splice(i,1);
+			}
+		}
+		if(isKeyDown('DOWN')) player.move(2);
+		if(isKeyDown('UP')) player.move(0);
+		if(isKeyDown('LEFT')) player.move(3);
+		if(isKeyDown('RIGHT')) player.move(1);
+		
+		if(isKeyDown('SPACE')) playerShoot();
+		timer+=1;
+		//createEnemy();
+		if(timer-time>0){
+			createEnemy();
+			//time=timer;
+			timer=0;
+		}
+		//console.log("TIME "+timer);
 
+		
+		intersectBulletsEnemys();
+		checkOnLose();
+	}
 	
-	intersectBulletsEnemys();
 	requestAnimationFrame(render);
 }
 
@@ -379,4 +400,12 @@ var loadSound=function() {
 			//snd2.stop();
 		}
 	});
+}
+
+var checkOnLose=function() {
+	text2.innerHTML="Life "+currentLife+"/"+totalLife;
+	if(currentLife<=0) {
+		isPlaing=false;
+		alert("ПРОЁБАНО!");
+	}
 }

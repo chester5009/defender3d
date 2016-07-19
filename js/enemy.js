@@ -41,6 +41,7 @@ Enemy.prototype.update = function() {
 
 	if(this.position.z>10){
 		snd3.play('sirena');
+		currentLife--;
 		this.isLife=false;
 	}
 
